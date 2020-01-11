@@ -87,6 +87,7 @@ export default {
          user: this.data
             ? this.data
             : {
+                 id: "",
                  name: "",
                  email: "",
                  password: "",
@@ -104,6 +105,7 @@ export default {
    },
    methods: {
       getNewUser: () => ({
+         id: "",
          name: "",
          email: "",
          password: "",
@@ -129,12 +131,6 @@ export default {
    watch: {
       reset() {
          this.resetForm();
-      },
-      data(data) {
-         if (data) {
-            this.user = data;
-         }
-         //Object.keys(data).forEach(key => (this.user[key] = data[key]));
       }
    }
 };

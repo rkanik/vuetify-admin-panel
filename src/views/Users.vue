@@ -4,6 +4,7 @@
          <cv-users-table
             @refresh="fetchUsers"
             @updateUser="onUpdateUser"
+            @deleteUser="onDeleteUser"
             :users="users"
             :headers="usersTableHeaders"
          />
@@ -25,14 +26,26 @@
       </v-dialog>
       <v-dialog class="elevation-1" v-model="updateUserDialog" persistent max-width="512">
          <c-user-form
+            v-if="updateUserDialog"
             @update="updateUser"
             @close="updateUserDialog=false"
             :type="'UPDATE'"
             :msg="'Update'"
             :data="selectedUser"
-            :loading="dialogLoading"
+            :loading="updateUserLoading"
             :reset="updateUserDialog"
          />
+      </v-dialog>
+      <v-dialog v-model="deleteConfirm" persistent max-width="512">
+         <v-card>
+            <v-card-title class="red lighten-5">Confirm delete</v-card-title>
+            <v-progress-linear v-if="confirmDeleteLoading" indeterminate color="red"></v-progress-linear>
+            <v-card-actions class="px-6 py-4">
+               <v-spacer></v-spacer>
+               <v-btn @click="(deleteConfirm=false,selectedUser={})" text color="grey">No</v-btn>
+               <v-btn @click="deleteUser(selectedUser)" color="red white--text lighten-1">Yes</v-btn>
+            </v-card-actions>
+         </v-card>
       </v-dialog>
    </div>
 </template>
@@ -52,28 +65,44 @@ export default {
       return {
          addUserDialog: false,
          updateUserDialog: false,
-         dialogLoading: false,
-         selectedUser: {
-            name: "",
-            email: "",
-            password: "",
-            roles: ["USER"]
-         }
+         deleteConfirm: false,
+         selectedUser: {}
       };
    },
    computed: {
-      ...mapGetters("Users", ["saveUserLoading", "users", "usersTableHeaders"])
+      ...mapGetters("Users", [
+         "saveUserLoading",
+         "updateUserLoading",
+         "confirmDeleteLoading",
+         "users",
+         "usersTableHeaders"
+      ])
    },
    methods: {
-      ...mapActions("Users", ["saveNewUser", "updateUser", "fetchUsers"]),
+      ...mapActions("Users", [
+         "saveNewUser",
+         "updateUser",
+         "deleteUser",
+         "fetchUsers"
+      ]),
       onUpdateUser(user) {
          this.selectedUser = user;
          this.updateUserDialog = true;
+      },
+      onDeleteUser(user) {
+         this.deleteConfirm = true;
+         this.selectedUser = user;
       }
    },
    watch: {
       saveUserLoading(val) {
          this.addUserDialog = val;
+      },
+      updateUserLoading(val) {
+         this.updateUserDialog = val;
+      },
+      confirmDeleteLoading(val) {
+         this.deleteConfirm = val;
       }
    }
 };

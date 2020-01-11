@@ -6,11 +6,13 @@ const initialState = () => ({
    usersTableHeaders: [
       { text: "Id number", value: "id" }, { text: "Full Name", value: "name" },
       { text: "Email Address", value: "email" }, { text: "Password", value: "password" },
-      { text: 'Edit', value: 'edit', sortable: false },
+      { text: "Roles", value: 'roles' }, { text: 'Edit', value: 'edit', sortable: false },
       { text: 'Delete', value: 'delete', sortable: false },
    ],
    signinLoading: false,
    saveUserLoading: false,
+   updateUserLoading: false,
+   confirmDeleteLoading: false,
    currentUser: {}
 });
 
@@ -25,12 +27,39 @@ const actions = {
       })
       commit("setState", { users })
    },
-   updateUser: ({ commit }, payload) => {
-      console.log(payload)
+   deleteUser: async ({ commit }, payload) => {
+      commit("setState", { confirmDeleteLoading: true })
+      try {
+         await db.collection('users').doc(payload.id).delete()
+         commit('filterUser', payload)
+      } catch (error) {
+         console.log("Error while deleting")
+      }
+      commit("setState", { confirmDeleteLoading: false })
+   },
+   updateUser: async ({ commit, state }, payload) => {
+      commit("setState", { updateUserLoading: true })
+      try {
+         await db.collection('users').doc(payload.id).update({
+            name: payload.name,
+            email: payload.email,
+            password: payload.password,
+            roles: payload.roles
+         })
+         commit("updateUser", { user: payload })
+      } catch (error) {
+         console.log(error)
+      }
+      commit("setState", { updateUserLoading: false })
    },
    saveNewUser: async ({ commit }, payload) => {
       commit("setState", { saveUserLoading: true })
-      let response = await db.collection("users").add(payload)
+      let response = await db.collection("users").add({
+         name: payload.name,
+         email: payload.email,
+         password: payload.password,
+         roles: payload.roles
+      })
       if (response.id) {
          commit("pushUser", { ...payload, id: response.id })
       } else {
@@ -77,6 +106,14 @@ const mutations = {
    },
    pushUser: (state, payload) => {
       state.users.push(payload);
+   },
+   updateUser: (state, payload) => {
+      state.users.forEach(user => {
+         user.id === payload.id && Object.keys(payload).forEach(key => user[key] = payload[key])
+      })
+   },
+   filterUser: (state, payload) => {
+      state.users = state.users.filter(user => user.id !== payload.id)
    }
 };
 
@@ -87,7 +124,9 @@ const getters = {
    currentUser: state => state.currentUser,
    signinLoading: state => state.signinLoading,
    saveUserLoading: state => state.saveUserLoading,
-   usersTableHeaders: state => state.usersTableHeaders
+   usersTableHeaders: state => state.usersTableHeaders,
+   updateUserLoading: state => state.updateUserLoading,
+   confirmDeleteLoading: state => state.confirmDeleteLoading
 };
 
 export default {
