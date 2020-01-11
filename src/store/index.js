@@ -13,6 +13,9 @@ export default new Vuex.Store({
    state: {
       isAuthenticated: false
    },
+   getters: {
+      isAuthenticated: state => state.isAuthenticated
+   },
    mutations: {
       setRootState: (state, payload) => {
          Object.keys(payload).forEach(key => (state[key] = payload[key]));

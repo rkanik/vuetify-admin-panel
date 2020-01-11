@@ -3,11 +3,45 @@ import router from "../../router";
 
 const initialState = () => ({
    users: [],
+   usersTableHeaders: [
+      { text: "Id number", value: "id" }, { text: "Full Name", value: "name" },
+      { text: "Email Address", value: "email" }, { text: "Password", value: "password" },
+      { text: 'Edit', value: 'edit', sortable: false },
+      { text: 'Delete', value: 'delete', sortable: false },
+   ],
    signinLoading: false,
+   saveUserLoading: false,
    currentUser: {}
 });
 
 const actions = {
+   fetchUsers: async ({ commit }) => {
+      let snapshot = await db.collection('users').get()
+      let users = []; snapshot.forEach(doc => {
+         users.push({
+            id: doc.id,
+            ...doc.data()
+         })
+      })
+      commit("setState", { users })
+   },
+   updateUser: ({ commit }, payload) => {
+      console.log(payload)
+   },
+   saveNewUser: async ({ commit }, payload) => {
+      commit("setState", { saveUserLoading: true })
+      let response = await db.collection("users").add(payload)
+      if (response.id) {
+         commit("pushUser", { ...payload, id: response.id })
+      } else {
+         console.log("Error happened")
+      }
+      commit("setState", { saveUserLoading: false })
+   },
+   signoutAdmin: ({ commit }) => {
+      commit("setRootState", { isAuthenticated: false }, { root: true });
+      commit("resetState"); router.push("/signin")
+   },
    fetchUser: async ({ commit }, payload) => {
       commit("setState", { signinLoading: true });
       let snapshot = await db
@@ -51,7 +85,9 @@ const state = initialState();
 const getters = {
    users: state => state.users,
    currentUser: state => state.currentUser,
-   signinLoading: state => state.signinLoading
+   signinLoading: state => state.signinLoading,
+   saveUserLoading: state => state.saveUserLoading,
+   usersTableHeaders: state => state.usersTableHeaders
 };
 
 export default {
