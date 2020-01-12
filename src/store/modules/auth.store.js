@@ -17,7 +17,10 @@ const actions = {
       commit("Progress/setState", { initializing: true }, { root: true })
       let prevState = session.get("Auth")
       prevState !== null
-         ? commit('setState', prevState)
+         ? (
+            commit('setState', prevState),
+            await dispatch("Checkins/fetchCheckIn", prevState.currentUser.id, { root: true })
+         )
          : hasCookie('user-token') &&
          await dispatch("fetchUserById", getCookie("user-token"))
       commit("Progress/setState", { initializing: false }, { root: true })
@@ -28,12 +31,14 @@ const actions = {
       commit("Progress/resetState", {}, { root: true })
       router.replace("/signin")
    },
-   onSignin: ({ commit }, { doc, remember }) => {
+   onSignin: async ({ commit, dispatch }, { doc, remember }) => {
+      console.log('onSignin')
       let user = { id: doc.id, ...doc.data() };
       delete user.password;
       let authState = { authenticated: true, isAdmin: user.roles.includes("ADMIN"), currentUser: user }
       commit('setState', authState); session.set({ Auth: authState })
       remember && setCookie("user-token", user.id, 7)
+      await dispatch("Checkins/fetchCheckIn", user.id, { root: true })
       router.replace("/")
       commit("Progress/setState", { initializing: false }, { root: true })
    },

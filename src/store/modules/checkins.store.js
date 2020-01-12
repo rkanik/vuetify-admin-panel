@@ -26,25 +26,27 @@ const actions = {
       })
       commit("setState", { checkIns })
    },
-   fetchCheckIn: async ({ commit, state }, payload) => {
+   fetchCheckIn: async ({ commit }, payload) => {
       let today = new Date(new Date().toDateString()).getTime()
       let res = await db.collection('check-ins')
          .where("userId", "==", payload)
          .where("date", "==", today)
          .get()
-      let data = res.docs[0].data();
-      !res.empty && commit("setState", {
+
+      let data = res.docs[0] && res.docs[0].data()
+      let state = res.empty ? { checkedIn: false } : {
          checkedIn: {
             userId: data.userId,
             checkedIn: moment(data.checkedIn).format('MMMM Do YYYY, h:mm:ss a'),
             checkedOut: data.checkedOut && moment(data.checkedOut).format('MMMM Do YYYY, h:mm:ss a'),
          }
-      })
+      }
+      commit('setState', state)
    },
    checkinUser: async ({ commit, rootState }) => {
       try {
          let data = {
-            userId: rootState.Users.currentUser.id,
+            userId: rootState.Auth.currentUser.id,
             checkedIn: Date.now(),
             date: new Date(new Date().toDateString()).getTime()
          }
@@ -63,7 +65,7 @@ const actions = {
    checkoutUser: async ({ commit, state, rootState }) => {
       try {
          let now = Date.now()
-         let res = await db.collection('check-ins').where("userId", "==", rootState.Users.currentUser.id).get()
+         let res = await db.collection('check-ins').where("userId", "==", rootState.Auth.currentUser.id).get()
          !res.empty && res.docs[0].ref.update({ checkedOut: now })
          commit("setState", {
             checkedIn: {
