@@ -19,43 +19,6 @@ const initialState = () => ({
 });
 
 const actions = {
-   fetchCheckIn: async ({ commit, state }, payload) => {
-      let today = new Date(new Date().toDateString())
-      let res = await db.collection('check-ins')
-         .where("userId", "==", payload)
-         .where("date", "==", today)
-         .get()
-
-      !res.empty && commit("setState", { checkedIn: res.docs[0].data() })
-   },
-   checkinUser: async ({ commit, state }) => {
-      try {
-         let data = {
-            userId: state.currentUser.id,
-            checkedIn: new Date(),
-            date: new Date(new Date().toDateString())
-         }
-         await db.collection('check-ins').add(data)
-         commit("setState", { checkedIn: data })
-      } catch (error) {
-         console.log("error check in", error);
-      }
-   },
-   checkoutUser: async ({ commit, state }) => {
-      try {
-         let now = new Date()
-         let res = await db.collection('check-ins').where("userId", "==", state.currentUser.id).limit(1).get()
-         !res.empty && res.docs[0].ref.update({ checkedOut: now })
-         commit("setState", {
-            checkedIn: {
-               ...state.checkedIn,
-               checkedOut: now
-            }
-         })
-      } catch (error) {
-         console.log("Error while checking out", error);
-      }
-   },
    fetchUsers: async ({ commit }) => {
       let snapshot = await db.collection('users').get()
       let users = []; snapshot.forEach(doc => {
@@ -139,7 +102,7 @@ const actions = {
                roles: user.roles
             }
          });
-         dispatch("fetchCheckIn", id);
+         dispatch("Checkins/fetchCheckIn", id, { root: true });
       }
       commit("setState", { signinLoading: false });
    }
