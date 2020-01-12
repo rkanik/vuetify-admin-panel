@@ -32,7 +32,6 @@ const actions = {
       router.replace("/signin")
    },
    onSignin: async ({ commit, dispatch }, { doc, remember }) => {
-      console.log('onSignin')
       let user = { id: doc.id, ...doc.data() };
       delete user.password;
       let authState = { authenticated: true, isAdmin: user.roles.includes("ADMIN"), currentUser: user }

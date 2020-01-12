@@ -64,8 +64,8 @@ export default {
       showPassword: false,
       error: false,
       user: {
-         email: "admin@admin.com",
-         password: "1",
+         email: "",
+         password: "",
          remember: false
       },
       passRules: [v => !!v || "Password is required"],

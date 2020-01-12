@@ -1,10 +1,10 @@
 <template>
    <v-card max-width="320">
-      <v-card-title>CHECKIN</v-card-title>
+      <v-card-title>CHECK-IN</v-card-title>
       <v-divider></v-divider>
       <v-card-text>
          <div>
-            <p class="subtitle-1 mb-1">Your Checkin</p>
+            <p class="subtitle-1 mb-1">Your Check-in</p>
             <p class="mb-0">
                Checkin:
                <span v-if="checked.checkedIn">{{checked.checkedIn}}</span>
@@ -26,7 +26,8 @@
             class="d-block success"
          >
             <v-icon left>check_circle</v-icon>
-            <span>Checkin now</span>
+            <span v-if="!checked.checkedOut">Checkin now</span>
+            <span v-else>Checked Out</span>
          </v-btn>
          <v-btn v-else @click="$emit('checkout')" dark class="d-block red lighen-1">
             <v-icon left>exit_to_app</v-icon>
