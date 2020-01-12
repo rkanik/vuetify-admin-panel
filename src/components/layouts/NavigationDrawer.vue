@@ -3,11 +3,8 @@
       <template v-slot:prepend>
          <v-list>
             <v-list-item>
-               <v-list-item-avatar>
-                  <v-img
-                     src="https://cdn5.f-cdn.com/ppic/128050081/logo/28687844/vk28p/profile_logo_.jpg"
-                  ></v-img>
-               </v-list-item-avatar>
+               <img width="86" height="64" src="http://www.cystemarts.com/Images/logo.png"/>
+               <!-- <v-list-item-avatar width="64" height="64"></v-list-item-avatar> -->
             </v-list-item>
             <v-list-item link two-line>
                <v-list-item-content>
@@ -47,7 +44,7 @@ export default {
          navItems: [
             { text: "Dashboard", icon: "mdi-view-dashboard", route: "/" },
             { text: "Users", icon: "mdi-account-group", route: "/users" },
-            { text: "Checkins", icon: "mdi-check-circle", route: "/check-ins" },
+            { text: "Checkins", icon: "mdi-check-circle", route: "/check-ins" }
          ]
       };
    },

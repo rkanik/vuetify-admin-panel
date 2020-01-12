@@ -2,6 +2,7 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import views from "../views/_index";
 import store from "../store";
+import session from "../helpers/session"
 
 Vue.use(VueRouter);
 
@@ -10,23 +11,6 @@ const routes = Object.keys(views).map(view => ({
    name: views[view].name,
    component: views[view]
 }))
-// [
-//    {
-//       path: "/",
-//       name: "dashboard",
-//       component: views.Dashboard
-//    },
-//    {
-//       path: "/signin",
-//       name: "signin",
-//       component: views.Signin
-//    },
-//    {
-//       path: "/users",
-//       name: "users",
-//       component: views.Users
-//    }
-// ];
 
 const router = new VueRouter({
    mode: "history",
@@ -35,9 +19,11 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-   if (to.path !== "/signin" && !store.state.isAuthenticated) {
+   let auth = session.get("Auth");
+   let authenticated = (auth && auth.authenticated) || store.getters["Auth/authenticated"]
+   if (to.path !== "/signin" && !authenticated) {
       next("/signin");
-   } else if (to.path === "/signin" && store.state.isAuthenticated) {
+   } else if (to.path === "/signin" && authenticated) {
       next("/");
    } else {
       next();

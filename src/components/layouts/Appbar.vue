@@ -6,7 +6,7 @@
             <span class="font-weight-light">Admin</span> Panel
          </v-toolbar-title>
          <v-spacer></v-spacer>
-         <v-btn text @click="signoutAdmin">
+         <v-btn text @click="signOut">
             <span>{{ currentUser.name }}</span>
             <v-icon right>exit_to_app</v-icon>
          </v-btn>
@@ -31,10 +31,10 @@ export default {
       "cv-navigation-drawer": NavigationDrawer
    },
    computed: {
-      ...mapGetters("Users", ["currentUser"])
+      ...mapGetters("Auth", ["currentUser"])
    },
    methods: {
-      ...mapActions("Users", ["signoutAdmin"])
+      ...mapActions("Auth", ["signOut"])
    }
 };
 </script>
