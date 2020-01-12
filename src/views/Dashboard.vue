@@ -1,19 +1,25 @@
 <template>
    <div class="dashboard">
-      <h1 class="headline">DASHBOARD</h1>
-      {{currentUser}}
+      <c-checkin @checkin="checkinUser" @checkout="checkoutUser" :checked="checkedIn" />
    </div>
 </template>
 
 <script>
-import { mapGetters } from "vuex";
-
+import { mapGetters, mapActions } from "vuex";
+/** Components */
+import Checkin from "../components/users/User.Checkin";
 export default {
    name: "dashboard",
    path: "/",
-   components: {},
+   components: {
+      "c-checkin": Checkin
+   },
    computed: {
-      ...mapGetters("Users", ["currentUser"])
+      ...mapGetters("Users", ["currentUser"]),
+      ...mapGetters("Checkins", ["checkedIn"])
+   },
+   methods: {
+      ...mapActions("Checkins", ["checkinUser", "checkoutUser"])
    }
 };
 </script>

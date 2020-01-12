@@ -10,13 +10,52 @@ const initialState = () => ({
       { text: 'Delete', value: 'delete', sortable: false },
    ],
    signinLoading: false,
+   signinError: false,
    saveUserLoading: false,
    updateUserLoading: false,
    confirmDeleteLoading: false,
-   currentUser: {}
+   currentUser: {},
+   checkedIn: false,
 });
 
 const actions = {
+   fetchCheckIn: async ({ commit, state }, payload) => {
+      let today = new Date(new Date().toDateString())
+      let res = await db.collection('check-ins')
+         .where("userId", "==", payload)
+         .where("date", "==", today)
+         .get()
+
+      !res.empty && commit("setState", { checkedIn: res.docs[0].data() })
+   },
+   checkinUser: async ({ commit, state }) => {
+      try {
+         let data = {
+            userId: state.currentUser.id,
+            checkedIn: new Date(),
+            date: new Date(new Date().toDateString())
+         }
+         await db.collection('check-ins').add(data)
+         commit("setState", { checkedIn: data })
+      } catch (error) {
+         console.log("error check in", error);
+      }
+   },
+   checkoutUser: async ({ commit, state }) => {
+      try {
+         let now = new Date()
+         let res = await db.collection('check-ins').where("userId", "==", state.currentUser.id).limit(1).get()
+         !res.empty && res.docs[0].ref.update({ checkedOut: now })
+         commit("setState", {
+            checkedIn: {
+               ...state.checkedIn,
+               checkedOut: now
+            }
+         })
+      } catch (error) {
+         console.log("Error while checking out", error);
+      }
+   },
    fetchUsers: async ({ commit }) => {
       let snapshot = await db.collection('users').get()
       let users = []; snapshot.forEach(doc => {
@@ -71,7 +110,8 @@ const actions = {
       commit("setRootState", { isAuthenticated: false }, { root: true });
       commit("resetState"); router.push("/signin")
    },
-   fetchUser: async ({ commit }, payload) => {
+
+   fetchUser: async ({ commit, dispatch }, payload) => {
       commit("setState", { signinLoading: true });
       let snapshot = await db
          .collection("users")
@@ -80,17 +120,26 @@ const actions = {
          .limit(1)
          .get();
       if (snapshot.empty) {
-         console.log("User not found");
+         commit("setState", { signinError: true })
       } else {
          let user = snapshot.docs[0].data();
-         delete user.password;
-         commit("setState", { currentUser: user });
+         /** Authenticated Admin users */
          if (user.roles.includes("ADMIN")) {
             commit("setRootState", { isAuthenticated: true }, { root: true });
             router.replace("/");
          } else {
             console.log("Not a admin account");
          }
+         let id = snapshot.docs[0].id
+         commit("setState", {
+            currentUser: {
+               id, name: user.name,
+               email: user.email,
+               password: user.password,
+               roles: user.roles
+            }
+         });
+         dispatch("fetchCheckIn", id);
       }
       commit("setState", { signinLoading: false });
    }
@@ -122,7 +171,13 @@ const state = initialState();
 const getters = {
    users: state => state.users,
    currentUser: state => state.currentUser,
+   checkedIn: state => state.checkedIn === false ? false : {
+      ...state.checkedIn,
+      checkedIn: new Date(state.checkedIn.checkedIn).toLocaleTimeString(),
+      checkedOut: state.checkedIn.checkedOut && new Date(state.checkedIn.checkedOut).toLocaleTimeString()
+   },
    signinLoading: state => state.signinLoading,
+   signiError: state => state.signiError,
    saveUserLoading: state => state.saveUserLoading,
    usersTableHeaders: state => state.usersTableHeaders,
    updateUserLoading: state => state.updateUserLoading,

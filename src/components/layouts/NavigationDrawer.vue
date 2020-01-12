@@ -46,7 +46,8 @@ export default {
          isDrawer: this.drawer,
          navItems: [
             { text: "Dashboard", icon: "mdi-view-dashboard", route: "/" },
-            { text: "Users", icon: "mdi-account-group", route: "/users" }
+            { text: "Users", icon: "mdi-account-group", route: "/users" },
+            { text: "Checkins", icon: "mdi-check-circle", route: "/check-ins" },
          ]
       };
    },

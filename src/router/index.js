@@ -5,23 +5,28 @@ import store from "../store";
 
 Vue.use(VueRouter);
 
-const routes = [
-   {
-      path: "/",
-      name: "dashboard",
-      component: views.Dashboard
-   },
-   {
-      path: "/signin",
-      name: "signin",
-      component: views.Signin
-   },
-   {
-      path: "/users",
-      name: "users",
-      component: views.Users
-   }
-];
+const routes = Object.keys(views).map(view => ({
+   path: views[view].path,
+   name: views[view].name,
+   component: views[view]
+}))
+// [
+//    {
+//       path: "/",
+//       name: "dashboard",
+//       component: views.Dashboard
+//    },
+//    {
+//       path: "/signin",
+//       name: "signin",
+//       component: views.Signin
+//    },
+//    {
+//       path: "/users",
+//       name: "users",
+//       component: views.Users
+//    }
+// ];
 
 const router = new VueRouter({
    mode: "history",
