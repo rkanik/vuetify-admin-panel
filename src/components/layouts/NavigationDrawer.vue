@@ -3,7 +3,7 @@
       <template v-slot:prepend>
          <v-list>
             <v-list-item>
-               <img width="86" height="64" src="http://www.cystemarts.com/Images/logo.png"/>
+               <img width="86" height="64" src="http://www.cystemarts.com/Images/logo.png" />
                <!-- <v-list-item-avatar width="64" height="64"></v-list-item-avatar> -->
             </v-list-item>
             <v-list-item link two-line>
@@ -20,12 +20,14 @@
       <v-divider></v-divider>
       <v-list shaped dense>
          <v-list-item-group color="success">
-            <v-list-item v-for="item in navItems" :key="item.text" exact router :to="item.route">
-               <v-list-item-icon>
-                  <v-icon v-text="item.icon"></v-icon>
-               </v-list-item-icon>
-               <v-list-item-title v-text="item.text"></v-list-item-title>
-            </v-list-item>
+            <template v-for="item in items">
+               <v-list-item :key="item.text" exact router :to="item.route">
+                  <v-list-item-icon>
+                     <v-icon v-text="item.icon"></v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-title v-text="item.text"></v-list-item-title>
+               </v-list-item>
+            </template>
          </v-list-item-group>
       </v-list>
    </v-navigation-drawer>
@@ -36,16 +38,13 @@ export default {
    name: "navigation-drawer",
    props: {
       drawer: Boolean,
-      user: Object
+      user: Object,
+      isAdmin: Boolean,
+      items: Array
    },
    data() {
       return {
-         isDrawer: this.drawer,
-         navItems: [
-            { text: "Dashboard", icon: "mdi-view-dashboard", route: "/" },
-            { text: "Users", icon: "mdi-account-group", route: "/users" },
-            { text: "Checkins", icon: "mdi-check-circle", route: "/check-ins" }
-         ]
+         isDrawer: this.drawer
       };
    },
    watch: {

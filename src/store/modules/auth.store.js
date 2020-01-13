@@ -18,7 +18,7 @@ const actions = {
       let prevState = session.get("Auth")
       prevState !== null
          ? (
-            commit('setState', prevState),
+            commit('setState', prevState), !prevState.isAdmin && commit('UI/removeNavItem', ["/users"], { root: true }),
             await dispatch("Checkins/fetchCheckIn", prevState.currentUser.id, { root: true })
          )
          : hasCookie('user-token') &&
@@ -35,6 +35,12 @@ const actions = {
       let user = { id: doc.id, ...doc.data() };
       delete user.password;
       let authState = { authenticated: true, isAdmin: user.roles.includes("ADMIN"), currentUser: user }
+      /** Fixing Navigation drawer itemBased on user roles */
+      if (!authState.isAdmin) {
+         commit('UI/removeNavItem', ["/users"], { root: true })
+      } else {
+         commit('UI/resetNavItems', null, { root: true })
+      }
       commit('setState', authState); session.set({ Auth: authState })
       remember && setCookie("user-token", user.id, 7)
       await dispatch("Checkins/fetchCheckIn", user.id, { root: true })
@@ -74,6 +80,7 @@ const state = initialState();
 
 const getters = {
    authenticated: st => st.authenticated,
+   isAdmin: st => st.isAdmin,
    currentUser: st => st.currentUser
 };
 

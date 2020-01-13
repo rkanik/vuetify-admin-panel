@@ -18,14 +18,25 @@ const router = new VueRouter({
    routes
 });
 
+const nonAdminRoutes = [
+   "/users"
+]
+
 router.beforeEach((to, from, next) => {
    let auth = session.get("Auth");
    let authenticated = (auth && auth.authenticated) || store.getters["Auth/authenticated"]
+   let isAdmin = (auth && auth.isAdmin) || store.getters["Auth/isAdmin"]
+   /** Guard for Signin page */
    if (to.path !== "/signin" && !authenticated) {
       next("/signin");
    } else if (to.path === "/signin" && authenticated) {
       next("/");
-   } else {
+   }
+   /** Guard for non admin page */
+   else if (nonAdminRoutes.includes(to.path) && !isAdmin) {
+      next("/")
+   }
+   else {
       next();
    }
 });

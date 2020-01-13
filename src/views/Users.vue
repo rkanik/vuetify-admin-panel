@@ -78,6 +78,9 @@ export default {
          "usersTableHeaders"
       ])
    },
+   created(){
+      this.fetchUsers()
+   },
    methods: {
       ...mapActions("Users", [
          "saveNewUser",

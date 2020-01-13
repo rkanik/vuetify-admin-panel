@@ -15,6 +15,8 @@
          @drawer="a=>drawerExpanded=a"
          :drawer="drawerExpanded"
          :user="currentUser"
+         :isAdmin="isAdmin"
+         :items="navItems"
       />
    </nav>
 </template>
@@ -31,7 +33,8 @@ export default {
       "cv-navigation-drawer": NavigationDrawer
    },
    computed: {
-      ...mapGetters("Auth", ["currentUser"])
+      ...mapGetters("Auth", ["currentUser", "isAdmin"]),
+      ...mapGetters("UI", ["navItems"])
    },
    methods: {
       ...mapActions("Auth", ["signOut"])

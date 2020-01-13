@@ -12,9 +12,16 @@ const initialState = () => ({
 });
 
 const actions = {
-   fetchCheckIns: async ({ commit }) => {
+   fetchCheckIns: async ({ commit, rootState }) => {
       let today = new Date(new Date().toDateString()).getTime()
-      let snapshot = await db.collection('check-ins').where("date", "==", today).get()
+
+      let snapshot = null
+      if (rootState.Auth.isAdmin) {
+         snapshot = await db.collection('check-ins').where("date", "==", today).get()
+      } else {
+         snapshot = await db.collection('check-ins').where("userId", "==", rootState.Auth.currentUser.id).get()
+      }
+
       let checkIns = []
       !snapshot.empty && snapshot.forEach(doc => {
          let data = doc.data()
