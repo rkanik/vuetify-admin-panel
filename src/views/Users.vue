@@ -5,8 +5,11 @@
             @refresh="fetchUsers"
             @updateUser="onUpdateUser"
             @deleteUser="onDeleteUser"
+            @select="fetchUsers"
             :users="users"
             :headers="usersTableHeaders"
+            :select="'All'"
+            :progress="progUsersTable"
          />
       </v-container>
       <v-container>
@@ -76,10 +79,11 @@ export default {
          "confirmDeleteLoading",
          "users",
          "usersTableHeaders"
-      ])
+      ]),
+      ...mapGetters("Progress",['progUsersTable'])
    },
-   created(){
-      this.fetchUsers()
+   created() {
+      this.fetchUsers();
    },
    methods: {
       ...mapActions("Users", [

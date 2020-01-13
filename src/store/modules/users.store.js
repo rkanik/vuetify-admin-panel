@@ -18,16 +18,39 @@ const initialState = () => ({
    checkedIn: false,
 });
 
+const state = initialState();
+
+const getters = {
+   users: state => state.users,
+   currentUser: state => state.currentUser,
+   checkedIn: state => state.checkedIn === false ? false : {
+      ...state.checkedIn,
+      checkedIn: new Date(state.checkedIn.checkedIn).toLocaleTimeString(),
+      checkedOut: state.checkedIn.checkedOut && new Date(state.checkedIn.checkedOut).toLocaleTimeString()
+   },
+   signinLoading: state => state.signinLoading,
+   signiError: state => state.signiError,
+   saveUserLoading: state => state.saveUserLoading,
+   usersTableHeaders: state => state.usersTableHeaders,
+   updateUserLoading: state => state.updateUserLoading,
+   confirmDeleteLoading: state => state.confirmDeleteLoading
+};
+
 const actions = {
-   fetchUsers: async ({ commit }) => {
-      let snapshot = await db.collection('users').get()
-      let users = []; snapshot.forEach(doc => {
-         users.push({
-            id: doc.id,
-            ...doc.data()
-         })
-      })
+   fetchUsers: async ({ commit }, select = "All") => {
+      commit("Progress/setState", { usersTable: true }, { root: true })
+
+      let ROLE = select === "Admins" ? "ADMIN" : select === "Users" ? "USER" : false
+      let query = db.collection('users')
+      query = ROLE ? query.where("roles", 'array-contains', ROLE) : query
+
+      let snapshot = await query.get()
+
+      let users = [];
+      snapshot.forEach(doc => { users.push({ id: doc.id, ...doc.data() }) })
+
       commit("setState", { users })
+      commit("Progress/setState", { usersTable: false }, { root: true })
    },
    deleteUser: async ({ commit }, payload) => {
       commit("setState", { confirmDeleteLoading: true })
@@ -127,24 +150,6 @@ const mutations = {
    filterUser: (state, payload) => {
       state.users = state.users.filter(user => user.id !== payload.id)
    }
-};
-
-const state = initialState();
-
-const getters = {
-   users: state => state.users,
-   currentUser: state => state.currentUser,
-   checkedIn: state => state.checkedIn === false ? false : {
-      ...state.checkedIn,
-      checkedIn: new Date(state.checkedIn.checkedIn).toLocaleTimeString(),
-      checkedOut: state.checkedIn.checkedOut && new Date(state.checkedIn.checkedOut).toLocaleTimeString()
-   },
-   signinLoading: state => state.signinLoading,
-   signiError: state => state.signiError,
-   saveUserLoading: state => state.saveUserLoading,
-   usersTableHeaders: state => state.usersTableHeaders,
-   updateUserLoading: state => state.updateUserLoading,
-   confirmDeleteLoading: state => state.confirmDeleteLoading
 };
 
 export default {

@@ -29,6 +29,7 @@ const actions = {
       commit("resetState"); sessionStorage.clear()
       setCookie('user-token', null, -1)
       commit("Progress/resetState", {}, { root: true })
+      commit("Error/resetState", {}, { root: true })
       router.replace("/signin")
    },
    onSignin: async ({ commit, dispatch }, { doc, remember }) => {
@@ -60,6 +61,7 @@ const actions = {
          .get()
       if (snapshot.empty) {
          commit("Error/setState", { signin: true }, { root: true })
+         commit("Progress/setState", { signin: false }, { root: true });
       } else {
          await dispatch("onSignin", { doc: snapshot.docs[0], remember: payload.remember })
       }

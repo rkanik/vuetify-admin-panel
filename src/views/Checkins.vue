@@ -1,81 +1,72 @@
 <template>
    <v-container>
       <v-card elevation="1">
-         <v-card-title>
-            Today's Check-Ins
-            <!-- <v-btn @click="$emit('refresh')" icon class="ml-4">
-               <v-icon>mdi-refresh</v-icon>
-            </v-btn> -->
-            <v-spacer></v-spacer>
-            <v-text-field
-               v-model="searchKey"
-               append-icon="search"
-               label="Search"
-               single-line
-               hide-details
-            />
-         </v-card-title>
+         <v-container class="pb-0">
+            <div class="d-flex">
+               <v-card-title>Check-ins</v-card-title>
+               <v-spacer></v-spacer>
+               <v-form ref="form" class="d-flex pr-6">
+                  <v-select
+                     class="mr-4"
+                     :value="checkinsOf"
+                     @change="fetchCheckInsOf"
+                     :items="['Today','Yesterday','Last week','Last month']"
+                  ></v-select>
+                  <v-text-field
+                     v-model="searchKey"
+                     append-icon="search"
+                     label="Search"
+                     single-line
+                     hide-details
+                  />
+               </v-form>
+            </div>
+         </v-container>
+         <v-progress-linear v-if="progCheckinsTable" indeterminate color="green"></v-progress-linear>
          <v-data-table
             :headers="checkinsHeaders"
             :items="checkIns"
             :search="searchKey"
             :items-per-page="5"
-         >
-            <!-- <template v-slot:item.edit="{ item }">
-               <v-icon class="mr-2" @click="$emit('updateUser',item)">edit</v-icon>
-            </template>
-            <template v-slot:item.delete="{ item }">
-               <v-icon @click="$emit('deleteUser',item)">delete</v-icon>
-            </template>-->
-         </v-data-table>
+         ></v-data-table>
       </v-card>
-
-      <!-- <v-card elevation="1">
-         <v-card-title>Today's Check-ins</v-card-title>
-         <v-divider></v-divider>
-         <v-list three-line>
-            <template v-for="(item,key) in checkIns">
-               <v-list-item :key="item.userId+key">
-                  <v-list-item-content>
-                     <v-list-item-title>USER ID: {{item.userId}}</v-list-item-title>
-                     <v-list-item-subtitle>
-                        <span>Checkin:</span>
-                        <span>{{item.checkedIn}}</span>
-                     </v-list-item-subtitle>
-                     <v-list-item-subtitle>
-                        <span>Checkout:</span>
-                        <span
-                           v-if="item.checkedOut"
-                        >{{item.checkedOut}}</span>
-                        <span v-else>Not checked out</span>
-                     </v-list-item-subtitle>
-                  </v-list-item-content>
-               </v-list-item>
-               <v-divider v-if="key !== checkIns.length-1" :key="key" />
-            </template>
-         </v-list>
-      </v-card>-->
    </v-container>
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+import { mapActions, mapGetters, mapMutations } from "vuex";
 export default {
    name: "check-in",
    path: "/check-ins",
    data() {
       return {
-         searchKey: ""
+         searchKey: "",
+         TIME_IN_A_DAY: 1000 * 60 * 60 * 24, //86400000‬
+         TIME_OF_TODAY: new Date(new Date().toDateString()).getTime()
       };
    },
    created() {
-      this.fetchCheckIns();
+      this.fetchCheckInsOf(this.checkinsOf);
    },
    computed: {
-      ...mapGetters("Checkins", ["checkIns", "checkinsHeaders"])
+      ...mapGetters("Checkins", ["checkIns", "checkinsHeaders", "checkinsOf"]),
+      ...mapGetters("Progress", ["progCheckinsTable"])
    },
    methods: {
-      ...mapActions("Checkins", ["fetchCheckIns"])
+      ...mapActions("Checkins", ["fetchCheckIns"]),
+      ...mapMutations("Checkins", ["setState"]),
+      fetchCheckInsOf(checkinsOf) {
+         this.setState({ checkinsOf });
+         checkinsOf === "Today"
+            ? this.fetchCheckIns(this.TIME_OF_TODAY)
+            : checkinsOf === "Yesterday"
+            ? this.fetchCheckIns(this.TIME_OF_TODAY - this.TIME_IN_A_DAY * 1)
+            : checkinsOf === "Last week"
+            ? this.fetchCheckIns(this.TIME_OF_TODAY - this.TIME_IN_A_DAY * 7)
+            : checkinsOf === "Last month"
+            ? this.fetchCheckIns(this.TIME_OF_TODAY - this.TIME_IN_A_DAY * 30)
+            : false;
+      }
    }
 };
 </script>

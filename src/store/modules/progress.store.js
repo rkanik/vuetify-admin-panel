@@ -1,10 +1,11 @@
 
 const initialState = () => ({
    signin: false,
-   users: false,
+   usersTable: false,
    deleteUser: false,
    updateUser: false,
-   initializing: false
+   initializing: false,
+   checkinsTable: false
 });
 
 const actions = {
@@ -25,6 +26,8 @@ const state = initialState();
 
 const getters = {
    progSignin: state => state.signin,
+   progCheckinsTable: state => state.checkinsTable,
+   progUsersTable: state => state.usersTable,
    initializing: state => state.initializing
 };
 

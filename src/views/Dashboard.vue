@@ -1,5 +1,6 @@
 <template>
    <div class="dashboard">
+      
       <c-checkin @checkin="checkinUser" @checkout="checkoutUser" :checked="checkedIn" />
    </div>
 </template>

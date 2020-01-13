@@ -3,9 +3,7 @@ const initialState = () => ({
    signin: false,
 });
 
-const actions = {
-
-};
+const actions = {}
 
 const mutations = {
    setState: (state, payload) => {

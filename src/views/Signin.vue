@@ -34,14 +34,12 @@
                <v-checkbox v-model="user.remember" label="Remember me?" class="mt-0" required></v-checkbox>
             </v-form>
          </v-container>
-         <v-alert
-            v-model="error"
-            type="error"
-            outlined
-            dense
-            dismissible
-            class="ma-0 mx-6 mb-4"
-         >Wrong Email address or Password !</v-alert>
+         <div class="pos-rel mx-6 mb-4" v-if="errSignin">
+            <v-alert type="error" outlined dense class="ma-0">Wrong Email address or Password !</v-alert>
+            <v-btn @click="setState({signin:false})" icon class="pos-abs top-1 right-1">
+               <v-icon class="red--text text--lighten-1">mdi-close-circle</v-icon>
+            </v-btn>
+         </div>
          <v-progress-linear v-if="progSignin" indeterminate color="green"></v-progress-linear>
          <v-divider></v-divider>
          <v-container>
@@ -55,7 +53,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+import { mapActions, mapGetters, mapMutations } from "vuex";
 export default {
    name: "signin",
    path: "/signin",
@@ -80,6 +78,7 @@ export default {
    },
    methods: {
       ...mapActions("Auth", ["fetchUserByEmailPass"]),
+      ...mapMutations("Error", ["setState"]),
       signinAdmin() {
          this.user.email = this.user.email.toLowerCase();
          this.fetchUserByEmailPass(this.user);
@@ -92,3 +91,23 @@ export default {
    }
 };
 </script>
+<style>
+.pos-abs {
+   position: absolute;
+}
+.pos-rel {
+   position: relative;
+}
+.top-0 {
+   top: 0;
+}
+.top-1 {
+   top: 0.1rem;
+}
+.right-0 {
+   right: 0;
+}
+.right-1 {
+   right: 0.1rem;
+}
+</style>
