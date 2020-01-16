@@ -9,12 +9,45 @@ const initialState = () => ({
    checkedIn: false,
    /** Objects */
    currentUser: {},
-   checkIn: {}
+   checkIn: {},
+   location: {},
+   desLocation: {
+      latitude: 23.7748,//23.774741
+      longitude: 90.36542960000001,//90.36542960000001
+      maxLocation() {
+         return {
+            latitude: this.latitude + 0.00004,
+            longitude: this.longitude + 0.00001
+         }
+      }
+   }
 });
+
+const state = initialState();
+
+const getters = {
+   authenticated: st => st.authenticated,
+   isAdmin: st => st.isAdmin,
+   currentUser: st => st.currentUser,
+   location: st => st.location,
+   validLocation: st => {
+      if (!st.location.error) {
+         let maxLocation = st.desLocation.maxLocation()
+         console.log(maxLocation, st.location);
+         if (st.location.latitude <= maxLocation.latitude && st.location.longitude <= maxLocation.longitude) {
+            return true
+         } else {
+            return false
+         }
+      }
+   }
+};
 
 const actions = {
    initialize: async ({ commit, dispatch }) => {
+      console.log('initialize');
       commit("Progress/setState", { initializing: true }, { root: true })
+      dispatch("getUserGeoLocation")
       let prevState = session.get("Auth")
       prevState !== null
          ? (
@@ -23,7 +56,34 @@ const actions = {
          )
          : hasCookie('user-token') &&
          await dispatch("fetchUserById", getCookie("user-token"))
+      console.log("END initialize");
       commit("Progress/setState", { initializing: false }, { root: true })
+   },
+   getUserGeoLocation: async ({ commit }) => {
+      commit("Progress/setState", { location: true }, { root: true })
+      if (navigator.geolocation) {
+         navigator.geolocation.getCurrentPosition(
+            response => {
+               commit("setState", {
+                  location: {
+                     error: false,
+                     latitude: response.coords.latitude,
+                     longitude: response.coords.longitude,
+                     accuracy: response.coords.accuracy
+                  }
+               })
+               commit("Progress/setState", { location: false }, { root: true })
+            },
+            error => {
+               commit('setState', { location: { error: true, message: error.message, code: error.code } });
+               commit("Progress/setState", { location: false }, { root: true })
+            }
+         )
+      } else {
+         commit("setState", { location: { error: true, code: 9, message: "Browser Not Supported" } })
+         commit("Progress/setState", { location: false }, { root: true })
+      }
+
    },
    signOut: ({ commit }) => {
       commit("resetState"); sessionStorage.clear()
@@ -76,14 +136,6 @@ const mutations = {
       let newState = initialState();
       Object.keys(newState).forEach(key => (state[key] = newState[key]));
    }
-};
-
-const state = initialState();
-
-const getters = {
-   authenticated: st => st.authenticated,
-   isAdmin: st => st.isAdmin,
-   currentUser: st => st.currentUser
 };
 
 export default {

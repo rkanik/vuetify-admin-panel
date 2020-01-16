@@ -28,7 +28,7 @@
             <v-icon class="mr-2" @click="$emit('updateUser',item)">edit</v-icon>
          </template>
          <template v-slot:item.delete="{ item }">
-            <v-icon @click="$emit('deleteUser',item)">delete</v-icon>
+            <v-icon v-if="!item.roles.includes('ADMIN')" @click="$emit('deleteUser',item)">delete</v-icon>
          </template>
       </v-data-table>
    </v-card>

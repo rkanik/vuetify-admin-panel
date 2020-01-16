@@ -80,7 +80,7 @@ export default {
          "users",
          "usersTableHeaders"
       ]),
-      ...mapGetters("Progress",['progUsersTable'])
+      ...mapGetters("Progress", ["progUsersTable"])
    },
    created() {
       this.fetchUsers();

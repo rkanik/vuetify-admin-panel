@@ -1,7 +1,13 @@
 <template>
    <div class="dashboard">
-      
-      <c-checkin @checkin="checkinUser" @checkout="checkoutUser" :checked="checkedIn" />
+      <c-checkin
+         @checkin="checkinUser"
+         @checkout="checkoutUser"
+         :checked="checkedIn"
+         :loading="progLocation||progCheckin"
+         :location="location"
+         :validLocation="validLocation"
+      />
    </div>
 </template>
 
@@ -16,8 +22,10 @@ export default {
       "c-checkin": Checkin
    },
    computed: {
+      ...mapGetters("Auth", ["location", "validLocation"]),
       ...mapGetters("Users", ["currentUser"]),
-      ...mapGetters("Checkins", ["checkedIn"])
+      ...mapGetters("Checkins", ["checkedIn"]),
+      ...mapGetters("Progress", ["progLocation", "progCheckin"])
    },
    methods: {
       ...mapActions("Checkins", ["checkinUser", "checkoutUser"])

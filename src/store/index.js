@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import modules from "./modules/_index";
-//import createLogger from "vuex/dist/logger";
+import createLogger from "vuex/dist/logger";
 //import createPersistedstate from "vuex-persistedstate";
 
 Vue.use(Vuex);
@@ -9,7 +9,5 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
    modules,
-   // plugins: [debug && createLogger(), createPersistedstate({
-   //    paths: [""]
-   // })]
+   plugins: [createLogger(),/* createPersistedstate({paths: [""]})*/]
 });

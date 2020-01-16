@@ -25,3 +25,20 @@ export default {
    }
 };
 </script>
+
+<style >
+.position-relative {
+   position: relative;
+}
+.position-absolute {
+   position: absolute;
+}
+.to-center {
+   top: 50%;
+   left: 50%;
+   transform: translate(-50%, -50%);
+}
+.v-application {
+   background-color: #e8f5e9 !important;
+}
+</style>

@@ -41,6 +41,7 @@
                ></v-checkbox>
                <v-checkbox
                   v-model="user.roles"
+                  v-if="isAdmin"
                   value="ADMIN"
                   label="Admin"
                   type="checkbox"
@@ -70,6 +71,7 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex"
 export default {
    name: "user-form",
    props: {
@@ -102,6 +104,9 @@ export default {
             v => /.+@.+\..+/.test(v) || "E-mail must be valid"
          ]
       };
+   },
+   computed: {
+      ...mapGetters("Auth", ["isAdmin"])
    },
    methods: {
       getNewUser: () => ({

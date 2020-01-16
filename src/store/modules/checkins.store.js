@@ -36,12 +36,10 @@ const actions = {
 
       commit("Progress/setState", { checkinsTable: true }, { root: true })
       let query = db.collection('check-ins')
-
       rootState.Auth.isAdmin
          ? query = query
             .where("date", ">=", TIME)
             .orderBy("date", "desc")
-            .orderBy("checkedOut", "desc")
          : query = query.where("userId", "==", rootState.Auth.currentUser.id)
 
       let snapshot = await query.get()
@@ -57,11 +55,13 @@ const actions = {
          checkIns.push({ ...data, passed })
       })
 
+      console.log(checkIns);
+
       commit("setState", { checkIns })
       commit("Progress/setState", { checkinsTable: false }, { root: true })
    },
    fetchCheckIn: async ({ commit }, payload) => {
-
+      commit("Progress/setState", { checkIn: true }, { root: true })
       let today = new Date(new Date().toDateString()).getTime()
 
       let res = await db.collection('check-ins')
@@ -71,7 +71,10 @@ const actions = {
 
       let data = res.docs[0] && res.docs[0].data()
       let state = res.empty ? { checkedIn: false } : { checkedIn: data }
-      commit('setState', state)
+      setTimeout(() => {
+         commit('setState', state)
+         commit("Progress/setState", { checkIn: false }, { root: true })
+      }, 500);
 
    },
    checkinUser: async ({ commit, rootState }) => {
