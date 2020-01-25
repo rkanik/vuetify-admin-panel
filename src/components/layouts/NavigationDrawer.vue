@@ -3,8 +3,7 @@
       <template v-slot:prepend>
          <v-list>
             <v-list-item>
-               <img width="86" height="64" src="http://www.cystemarts.com/Images/logo.png" />
-               <!-- <v-list-item-avatar width="64" height="64"></v-list-item-avatar> -->
+               <img width="86" height="86" :src="require('../../assets/images/logo.jpg')" />
             </v-list-item>
             <v-list-item link two-line>
                <v-list-item-content>
