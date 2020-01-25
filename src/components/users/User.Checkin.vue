@@ -62,7 +62,7 @@
             </v-btn>
             <v-btn
                @click="$emit('checkout')"
-               :disabled="!validLocation"
+               :disabled="!validLocation||checked.checkedOut"
                class="d-block red lighen-1 white--text"
             >
                <v-icon left>exit_to_app</v-icon>
